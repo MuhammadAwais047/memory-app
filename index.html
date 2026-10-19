@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Twice — a memory game</title>
+  <meta name="description" content="Twice is a small, sharp memory game built with vanilla JavaScript — three decks, three difficulties, a timer, and personal bests saved in your browser. Flip two cards, find the pair, keep the thread." />
+  <meta property="og:title" content="Twice — a memory game" />
+  <meta property="og:description" content="Flip two cards at a time. Match the deck from memory. A vanilla-JS memory game." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#f2ede4" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='12' y='12' width='52' height='52' rx='14' fill='%234b3dff'/%3E%3Crect x='36' y='36' width='52' height='52' rx='14' fill='%23ff6a3d'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#table">Skip to the game</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="./" aria-label="Twice home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i></span>
+        <span class="brand-word">twice</span>
+        <span class="brand-tag">a memory game</span>
+      </a>
+      <button id="sound-btn" class="icon-btn" type="button" aria-pressed="true" aria-label="Sound" title="Sound on">
+        <svg class="ico-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h3.5L13 19V5L7.5 9H4Z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+        <svg class="ico-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M4 9v6h3.5L13 19V5L7.5 9H4Z"/><path d="m16.5 9.5 5 5M21.5 9.5l-5 5"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="dot dot-a"></span><span class="dot dot-b"></span>A game of attention</p>
+        <h1>Find the pair.<br><em>Keep the thread.</em></h1>
+        <p class="lede">Flip two cards at a time and match the deck from memory. The clock starts with your first turn — no hints, no rush, just a little focus.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <span class="mini-card mini-a">🦊</span>
+        <span class="mini-card mini-b"><i class="mini-mark"></i></span>
+        <span class="mini-card mini-c">🦉</span>
+        <span class="mini-spark">✦</span>
+      </div>
+    </section>
+
+    <section class="table" id="table" aria-label="Memory game">
+      <div class="table-top">
+        <div class="control-group">
+          <div class="seg" id="diff-tabs" role="group" aria-label="Difficulty">
+            <button type="button" data-diff="easy" class="active" aria-pressed="true">Easy <span>8 pairs</span></button>
+            <button type="button" data-diff="medium" aria-pressed="false">Medium <span>10 pairs</span></button>
+            <button type="button" data-diff="hard" aria-pressed="false">Hard <span>15 pairs</span></button>
+          </div>
+          <div class="theme-tabs" id="theme-tabs" role="group" aria-label="Deck theme">
+            <button type="button" data-theme="creatures" class="active" aria-pressed="true"><span aria-hidden="true">🦊</span> Creatures</button>
+            <button type="button" data-theme="cosmos" aria-pressed="false"><span aria-hidden="true">🪐</span> Cosmos</button>
+            <button type="button" data-theme="kitchen" aria-pressed="false"><span aria-hidden="true">🍋</span> Kitchen</button>
+          </div>
+        </div>
+        <button id="new-game" class="primary-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+          Deal again
+        </button>
+      </div>
+
+      <div class="scorebar">
+        <div class="score"><span>Time</span><b id="time">0:00</b></div>
+        <div class="score"><span>Moves</span><b id="moves">0</b></div>
+        <div class="score"><span>Pairs</span><b id="pairs">0 / 8</b></div>
+        <p class="best-pill" id="best-pill">No best yet</p>
+      </div>
+      <div class="progress" aria-hidden="true"><span id="progress"></span></div>
+
+      <div class="board-wrap">
+        <div id="board" class="board" data-diff="easy" role="group" aria-label="Card board"></div>
+
+        <div id="win" class="win-overlay" role="dialog" aria-modal="true" aria-labelledby="win-title" hidden>
+          <div class="win-card">
+            <p class="win-eyebrow">Deck cleared</p>
+            <h2 id="win-title">Every pair found.</h2>
+            <p class="win-copy" id="win-copy">Clean work. The deck did not stand a chance.</p>
+            <div class="win-stats">
+              <div><span>Moves</span><b id="win-moves">0</b></div>
+              <div><span>Time</span><b id="win-time">0:00</b></div>
+              <div><span>Best</span><b id="win-best">—</b></div>
+            </div>
+            <p class="new-best" id="win-badge" hidden>✦ New personal best</p>
+            <div class="win-actions">
+              <button id="win-again" class="primary-btn" type="button">Play again</button>
+              <button id="win-close" class="ghost-btn" type="button">View board</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-foot">
+        <p class="board-note" id="board-note">Creatures deck · match 8 pairs. The clock starts with your first flip.</p>
+        <p class="board-hint">Press <kbd>N</kbd> for a new deal</p>
+      </div>
+    </section>
+
+    <section class="records" aria-labelledby="records-heading">
+      <div class="records-head">
+        <h2 id="records-heading">Your records</h2>
+        <p>Saved in this browser.</p>
+      </div>
+      <div id="record-grid" class="record-grid"></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Twice — a vanilla-JS memory game by
+      <a href="https://github.com/MuhammadAwais047" target="_blank" rel="noopener noreferrer">Muhammad Awais</a> ·
+      <a href="https://github.com/MuhammadAwais047/memory-app" target="_blank" rel="noopener noreferrer">Source</a></p>
+    <p class="foot-note">No accounts, no network — just cards.</p>
+  </footer>
+
+  <p id="live" class="sr-only" aria-live="polite"></p>
+  <div id="confetti" class="confetti" aria-hidden="true"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
